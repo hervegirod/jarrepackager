@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:simpleType name="keepType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="skip"/>
+         <xs:enumeration value="keep"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:complexType name="propertiesType">
+      <xs:sequence>
+         <xs:element name="manifest" type="manifestType" maxOccurs="1" minOccurs="0"/>
+         <xs:choice>
+            <xs:element name="inputs" type="inputsType" maxOccurs="1" minOccurs="1"/>
+            <xs:element name="output" type="fileType" maxOccurs="1" minOccurs="1"/>
+            <xs:element name="debug" type="booleanType" maxOccurs="1" minOccurs="0"/>
+            <xs:element name="property" type="propertyType" maxOccurs="unbounded" minOccurs="0"/>
+         </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="desc" type="xs:string" />
+   </xs:complexType>
+   <xs:complexType name="inputsType">
+      <xs:sequence maxOccurs="unbounded" minOccurs="1">
+         <xs:element name="file" type="filePatternType" />
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="filePatternType">
+      <xs:sequence>
+         <xs:element name="manifest" type="inputManifestType" maxOccurs="1" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="url" type="xs:string" />
+   </xs:complexType>
+   <xs:complexType name="fileType">
+      <xs:attribute name="url" type="xs:anyURI" />
+   </xs:complexType>
+   <xs:complexType name="booleanType">
+      <xs:attribute name="value" type="xs:boolean" />
+   </xs:complexType>
+   <xs:complexType name="propertyType">
+      <xs:attribute name="key" type="xs:string" />
+      <xs:attribute name="value" type="xs:string" />
+   </xs:complexType>
+   <xs:complexType name="inputManifestType">
+      <xs:choice  maxOccurs="unbounded" minOccurs="0">
+         <xs:element name="existingProperty" type="existingPropertyType"/>
+      </xs:choice>
+      <xs:attribute name="keep" type="keepType" />
+   </xs:complexType>
+   <xs:complexType name="manifestType">
+      <xs:choice  maxOccurs="unbounded" minOccurs="0">
+         <xs:element name="existingProperty" type="existingPropertyType"/>
+         <xs:element name="newProperty" type="propertyType"/>
+      </xs:choice>
+      <xs:attribute name="keep" type="keepType" />
+   </xs:complexType>
+   <xs:complexType name="existingPropertyType">
+      <xs:attribute name="key" type="xs:string" />
+      <xs:attribute name="keep" type="keepType" />
+   </xs:complexType>
+   <xs:element name="properties" type="propertiesType"/>
+</xs:schema>
