@@ -24,10 +24,13 @@
       </xs:sequence>
    </xs:complexType>
    <xs:complexType name="filePatternType">
+      <xs:sequence>
+         <xs:element name="manifest" type="inputManifestType" maxOccurs="1" minOccurs="0"/>
+      </xs:sequence>
       <xs:attribute name="url" type="xs:string" />
    </xs:complexType>
    <xs:complexType name="fileType">
-      <xs:attribute name="url" type="xs:uri" />
+      <xs:attribute name="url" type="xs:anyURI" />
    </xs:complexType>
    <xs:complexType name="booleanType">
       <xs:attribute name="value" type="xs:boolean" />
@@ -35,6 +38,12 @@
    <xs:complexType name="propertyType">
       <xs:attribute name="key" type="xs:string" />
       <xs:attribute name="value" type="xs:string" />
+   </xs:complexType>
+   <xs:complexType name="inputManifestType">
+      <xs:choice  maxOccurs="unbounded" minOccurs="0">
+         <xs:element name="existingProperty" type="existingPropertyType"/>
+      </xs:choice>
+      <xs:attribute name="keep" type="keepType" />
    </xs:complexType>
    <xs:complexType name="manifestType">
       <xs:choice  maxOccurs="unbounded" minOccurs="0">
@@ -44,6 +53,8 @@
       <xs:attribute name="keep" type="keepType" />
    </xs:complexType>
    <xs:complexType name="existingPropertyType">
-      <xs:attribute name="keep" type="xs:boolean" />
+      <xs:attribute name="key" type="xs:string" />
+      <xs:attribute name="keep" type="keepType" />
    </xs:complexType>
+   <xs:element name="properties" type="propertiesType"/>
 </xs:schema>

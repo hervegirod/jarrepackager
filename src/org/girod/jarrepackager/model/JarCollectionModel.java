@@ -47,6 +47,7 @@ import java.util.jar.JarFile;
 public class JarCollectionModel {
    private final static String MANIFEST = "META-INF/MANIFEST.MF";
    private final static String MANIFEST_DIR = "META-INF/";
+   private ManifestModel manifestModel = new ManifestModel();
    private final List<JarRootDirectory> jarRootDirectories = new ArrayList<>();
    private final List<AbstractJarFileDirectory> jarDirectories = new ArrayList<>();
    private final Map<String, AbstractJarFileDirectory> paths = new HashMap<>();
@@ -56,6 +57,14 @@ public class JarCollectionModel {
    private JarRootDirectory rootDirectory = null;
 
    public JarCollectionModel() {
+   }
+
+   public void setManifestModel(ManifestModel manifestModel) {
+      this.manifestModel = manifestModel;
+   }
+
+   public ManifestModel getManifestModel() {
+      return manifestModel;
    }
 
    /**

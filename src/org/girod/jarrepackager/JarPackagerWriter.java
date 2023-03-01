@@ -34,8 +34,10 @@ package org.girod.jarrepackager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -46,6 +48,7 @@ import org.girod.jarrepackager.model.AbstractJarFileDirectory;
 import org.girod.jarrepackager.model.JarCollectionModel;
 import org.girod.jarrepackager.model.JarFileEntry;
 import org.girod.jarrepackager.model.ManifestJarEntry;
+import org.girod.jarrepackager.model.ManifestModel;
 
 /**
  * The Jar writer used for the repackaging.
@@ -92,13 +95,32 @@ public class JarPackagerWriter {
    }
 
    private Manifest createManifest() {
+      Set<String> addedProperties = new HashSet<>();
       Manifest manifest = new Manifest();
       Attributes global = manifest.getMainAttributes();
       global.put(Attributes.Name.MANIFEST_VERSION, "1.0.0");
-      Iterator<Entry<String, String>> it = inputModel.getManifestAttributes().entrySet().iterator();
+      addedProperties.add(Attributes.Name.MANIFEST_VERSION.toString());
+      ManifestModel manifestModel = inputModel.getManifestModel();
+      Iterator<Entry<String, String>> it = manifestModel.getNewProperties().entrySet().iterator();
+      while (it.hasNext()) {
+         Entry<String, String> entry = it.next();
+         global.put(new Attributes.Name(entry.getKey()), entry.getValue());
+         addedProperties.add(entry.getKey());
+         if (debug) {
+            System.out.println("Manifest property added: " + entry.getKey());
+         }
+      }
+      it = inputModel.getManifestAttributes().entrySet().iterator();
       while (it.hasNext()) {
          Entry<String, String> property = it.next();
-         global.put(new Attributes.Name(property.getKey()), property.getValue());
+         String key = property.getKey();
+         if (!addedProperties.contains(key) && manifestModel.allowExistingProperty(key)) {
+            global.put(new Attributes.Name(key), property.getValue());
+            if (debug) {
+               System.out.println("Manifest property added: " + key);
+            }
+            addedProperties.add(key);
+         }
       }
       return manifest;
    }

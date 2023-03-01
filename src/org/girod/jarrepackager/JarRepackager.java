@@ -36,7 +36,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
+import org.girod.jarrepackager.gui.JarRepackagerGUI;
 import org.girod.jarrepackager.model.JarCollectionModel;
+import org.girod.jarrepackager.model.ManifestModel;
+import org.girod.jarrepackager.parser.ParserUtils;
+import org.girod.jarrepackager.parser.PropertiesParser;
 import org.mdiutil.util.LauncherUtils;
 
 /**
@@ -49,7 +53,7 @@ public class JarRepackager {
    private static final String EXT_XML = "xml";
    private File[] inputFiles = null;
    private File outputFile = null;
-   private File properties = null;
+   private File propertiesFile = null;
    private boolean debug = false;
 
    public JarRepackager() {
@@ -96,7 +100,7 @@ public class JarRepackager {
                outputFile = ParserUtils.parseFileValue(dir, propValue, EXT_JAR);
                break;
             case "properties":
-               properties = ParserUtils.parseFileValue(dir, propValue, EXT_XML);
+               propertiesFile = ParserUtils.parseFileValue(dir, propValue, EXT_XML);
                break;
             case "debug":
                debug = propValue.equals("true");
@@ -134,6 +138,15 @@ public class JarRepackager {
    }
 
    /**
+    * Set the properties xml file.
+    *
+    * @param propertiesFile the properties file
+    */
+   public void setPropertiesFile(File propertiesFile) {
+      this.propertiesFile = propertiesFile;
+   }
+
+   /**
     * Set the debug property.
     *
     * @param debug the debug property
@@ -143,14 +156,29 @@ public class JarRepackager {
    }
 
    /**
+    * Return the debug property.
+    *
+    * @return the debug property
+    */
+   public boolean isDebugging() {
+      return debug;
+   }
+
+   /**
     * Perform the repackaging.
     *
     * @return true if it could be performed
     * @throws IOException
     */
    public boolean repackage() throws IOException {
+      ManifestModel manifestModel = new ManifestModel();
+      if (propertiesFile != null && propertiesFile.exists() && propertiesFile.isFile()) {
+         PropertiesParser propertiesParser = new PropertiesParser(this);
+         manifestModel = propertiesParser.parse(propertiesFile);
+      }
       if (inputFiles != null && inputFiles.length != 0 && outputFile != null) {
          JarPackagerReader reader = new JarPackagerReader(inputFiles);
+         reader.setManifestModel(manifestModel);
          JarCollectionModel jarModel = reader.analyze();
          JarPackagerWriter writer = new JarPackagerWriter(jarModel, outputFile);
          writer.setDebug(debug);

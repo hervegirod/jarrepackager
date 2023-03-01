@@ -37,6 +37,7 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.girod.jarrepackager.model.JarCollectionModel;
+import org.girod.jarrepackager.model.ManifestModel;
 
 /**
  * The Jar reader used for the repackaging.
@@ -56,6 +57,10 @@ public class JarPackagerReader {
       this.inputFiles = inputFiles;
    }
 
+   public void setManifestModel(ManifestModel manifestModel) {
+      jarModel.setManifestModel(manifestModel);
+   }
+
    /**
     * Return the resulting model.
     *
@@ -67,8 +72,9 @@ public class JarPackagerReader {
 
    /**
     * Analyse the content of the model.
+    *
     * @return the model
-    * @throws IOException 
+    * @throws IOException
     */
    public JarCollectionModel analyze() throws IOException {
       for (int i = 0; i < inputFiles.length; i++) {

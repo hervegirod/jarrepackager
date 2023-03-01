@@ -29,7 +29,7 @@ either expressed or implied, of the FreeBSD Project.
 Alternatively if you have any questions about this project, you can visit
 the project website at the project page on https://github.com/hervegirod/jarrepackager
  */
-package org.girod.jarrepackager;
+package org.girod.jarrepackager.parser;
 
 import java.io.File;
 import java.net.MalformedURLException;

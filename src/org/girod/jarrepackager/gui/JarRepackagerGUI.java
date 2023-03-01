@@ -29,7 +29,7 @@ either expressed or implied, of the FreeBSD Project.
 Alternatively if you have any questions about this project, you can visit
 the project website at the project page on https://github.com/hervegirod/jarrepackager
  */
-package org.girod.jarrepackager;
+package org.girod.jarrepackager.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -37,6 +37,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -48,6 +52,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
+import org.girod.jarrepackager.JarRepackager;
+import org.mdiutil.swing.ExtensionFileFilter;
 import org.mdiutil.swing.JFileSelector;
 
 /**
@@ -58,14 +65,17 @@ import org.mdiutil.swing.JFileSelector;
 public class JarRepackagerGUI extends JFrame {
    private File[] inputFiles = null;
    private File outputFile = null;
+   private File propertiesFile = null;
    private JFileSelector outputSelector = null;
    private JFileSelector inputSelector = null;
+   private JFileSelector propertiesSelector = null;
    private JCheckBox debugCb = null;
    private AbstractAction applyAction = null;
    private JProgressBar progress = null;
    private File dir = null;
    private final JarRepackager repackager;
-   private final ExtensionFileFilter jarFileFilter = new ExtensionFileFilter("jar");
+   private ExtensionFileFilter jarFileFilter;
+   private ExtensionFileFilter xmlFileFilter;
 
    public JarRepackagerGUI(JarRepackager repackager) {
       super("Jar Repackager");
@@ -77,6 +87,12 @@ public class JarRepackagerGUI extends JFrame {
 
    private void setup() {
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      String[] ext = { "xml" };
+      xmlFileFilter = new ExtensionFileFilter(ext, "XML Files");
+
+      String[] ext2 = { "jar" };
+      jarFileFilter = new ExtensionFileFilter(ext2, "Jar Files");
 
       JMenuBar mbar = new JMenuBar();
       this.setJMenuBar(mbar);
@@ -116,6 +132,20 @@ public class JarRepackagerGUI extends JFrame {
          @Override
          public void actionPerformed(ActionEvent e) {
             outputFile = outputSelector.getSelectedFile();
+            checkApplyState();
+         }
+      });
+
+      propertiesSelector = new JFileSelector("Select properties file");
+      propertiesSelector.setCurrentDirectory(dir);
+      propertiesSelector.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      propertiesSelector.setDialogType(JFileChooser.OPEN_DIALOG);
+
+      propertiesSelector.setFileFilter(xmlFileFilter);
+      propertiesSelector.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            propertiesFile = propertiesSelector.getSelectedFile();
             checkApplyState();
          }
       });
@@ -172,6 +202,18 @@ public class JarRepackagerGUI extends JFrame {
       contentPanel.add(outputPanel);
       contentPanel.add(Box.createVerticalStrut(5));
 
+      JPanel propertiesPanel = new JPanel();
+      propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.X_AXIS));
+      propertiesPanel.add(Box.createHorizontalStrut(5));
+      propertiesPanel.add(new JLabel("Properties File"));
+      propertiesPanel.add(Box.createHorizontalStrut(5));
+      propertiesPanel.add(propertiesSelector);
+      propertiesPanel.add(Box.createHorizontalStrut(5));
+      propertiesPanel.add(Box.createHorizontalGlue());
+
+      contentPanel.add(propertiesPanel);
+      contentPanel.add(Box.createVerticalStrut(5));
+
       JPanel debugPanel = new JPanel();
       debugPanel.setLayout(new BoxLayout(debugPanel, BoxLayout.X_AXIS));
       debugPanel.add(Box.createHorizontalStrut(5));
@@ -185,7 +227,7 @@ public class JarRepackagerGUI extends JFrame {
    }
 
    private void checkApplyState() {
-      if (inputFiles != null && outputFile != null && inputFiles.length != 0) {
+      if (((inputFiles != null && inputFiles.length != 0) || propertiesFile != null) && outputFile != null) {
          applyAction.setEnabled(true);
       } else {
          applyAction.setEnabled(false);
@@ -193,12 +235,42 @@ public class JarRepackagerGUI extends JFrame {
    }
 
    private void apply() {
-      try {
-         repackager.setInputFiles(inputFiles);
-         repackager.setOutputFile(outputFile);
-         repackager.repackage();
-      } catch (IOException ex) {
-         ex.printStackTrace();
-      }
+      applyAction.setEnabled(false);
+      progress.setStringPainted(true);
+      progress.setString("Repackaging Started");
+      progress.setIndeterminate(true);
+      repackager.setInputFiles(inputFiles);
+      repackager.setOutputFile(outputFile);
+      repackager.setPropertiesFile(propertiesFile);
+      ExecutorService executor = Executors.newSingleThreadExecutor();
+      Future<Boolean> future = executor.submit(new Callable<Boolean>() {
+         @Override
+         public Boolean call() {
+            try {
+               boolean result = repackager.repackage();
+               if (result) {
+                  setProgressFinishedText("Repackaging Finished");
+               } else {
+                  setProgressFinishedText("Repackaging Failed");
+               }
+               return result;
+            } catch (IOException ex) {
+               setProgressFinishedText("Repackaging Failed");
+               ex.printStackTrace();
+               return false;
+            }
+         }
+      });
+   }
+
+   private void setProgressFinishedText(String message) {
+      SwingUtilities.invokeLater(new Runnable() {
+         @Override
+         public void run() {
+            applyAction.setEnabled(true);
+            progress.setIndeterminate(false);
+            progress.setString(message);
+         }
+      });
    }
 }
