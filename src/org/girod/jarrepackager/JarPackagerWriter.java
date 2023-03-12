@@ -137,6 +137,7 @@ public class JarPackagerWriter {
    }
 
    private void writeManifestContent(byte[] buf, JarOutputStream out) throws IOException {
+      // https://stackoverflow.com/questions/62313791/replacing-the-manifest-mf-file-in-a-jar-programmatically
       Iterator<ManifestJarEntry> it = inputModel.getManifestContent().values().iterator();
       while (it.hasNext()) {
          ManifestJarEntry jarEntry = it.next();
