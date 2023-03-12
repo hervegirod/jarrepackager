@@ -104,7 +104,7 @@
 
    <target depends="version, -post-init" name="-ziptests">
       <!-- zip source files -->
-      <zip compress="true" defaultexcludes="true" zipfile="${dist.dir}/${archiveName}-src-${version}.zip">
+      <zip compress="true" defaultexcludes="true" zipfile="${dist.dir}/${archiveName}-test-${version}.zip">
          <fileset description="tests directory" dir="${test.dir}/..">
             <include name="test/**/*.java"/>
             <include name="test/**/*.xml"/>
