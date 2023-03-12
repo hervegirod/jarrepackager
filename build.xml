@@ -18,6 +18,7 @@
       <property name="archiveName" value="jarRepackager"/>
       <property name="docGeneratorDirURL" value="https://master.dl.sourceforge.net/project/docjgenerator/" />
       <property name="docGeneratorURL" value="${docGeneratorDirURL}/Version%201.6.4.2/docGenerator-bin-1.6.4.2.zip" />
+      <property name="wikiDir" value="web/wiki" />
       <property name="docGeneratorDir" value="web/soft/"/>
       <condition property="docgenerator.notexists">
          <not>
@@ -26,6 +27,9 @@
       </condition>
       <condition property="docgenerator.exists">
          <available file="web/soft/docGenerator.jar" type="file"/>
+      </condition>
+      <condition property="wiki.exists">
+         <available file="web/wiki/index.html" type="file"/>
       </condition>
    </target>
    <!-- =================================================================== -->
