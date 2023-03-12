@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties desc="configuration for netty">
+   <manifest keep="skip">
+      <existingProperty key="Build-Jdk" keep="keep" />
+      <existingProperty key="Implementation-Vendor" keep="keep" />
+      <existingProperty key="Implementation-Version" too="keep" />
+      <existingProperty key="Implementation-Vendor-Id" keep="keep" />
+      <newProperty key="Implementation-Title" value="Netty/All-in-One" />
+      <newProperty key="Automatic-Module-Name" value="io.netty.all" />
+   </manifest>
+   <inputs>
+      <file url="netty*.jar" />
+   </inputs>
+</properties>
