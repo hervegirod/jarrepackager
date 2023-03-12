@@ -34,11 +34,15 @@ package org.girod.jarrepackager;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
+import org.girod.jarrepackager.gui.ErrorLogger;
 import org.girod.jarrepackager.gui.JarRepackagerGUI;
 import org.girod.jarrepackager.model.JarCollectionModel;
 import org.girod.jarrepackager.model.ManifestModel;
+import org.girod.jarrepackager.parser.PackagerError;
 import org.girod.jarrepackager.parser.ParserUtils;
 import org.girod.jarrepackager.parser.PropertiesParser;
 import org.mdiutil.util.LauncherUtils;
@@ -54,6 +58,8 @@ public class JarRepackager {
    private File[] inputFiles = null;
    private File outputFile = null;
    private File propertiesFile = null;
+   private JarRepackagerGUI gui = null;
+   private final List<PackagerError> packagerErrors = new ArrayList<>();
    private boolean debug = false;
 
    public JarRepackager() {
@@ -111,12 +117,26 @@ public class JarRepackager {
          try {
             repackage();
          } catch (IOException ex) {
-            ex.printStackTrace();
+            packagerErrors.add(new PackagerError(ex));
+            System.err.println(ex.getMessage());
+         }
+         if (!packagerErrors.isEmpty()) {
+            ErrorLogger logger = new ErrorLogger();
+            logger.printErrors(packagerErrors);
          }
       } else {
-         JarRepackagerGUI gui = new JarRepackagerGUI(this);
+         gui = new JarRepackagerGUI(this);
          gui.setVisible(true);
       }
+   }
+
+   /**
+    * Return the errors encountered during the repackaging.
+    *
+    * @return the errors
+    */
+   public List<PackagerError> getErrors() {
+      return packagerErrors;
    }
 
    /**
@@ -126,6 +146,18 @@ public class JarRepackager {
     */
    public void setInputFiles(File[] inputFiles) {
       this.inputFiles = inputFiles;
+      if (gui != null) {
+         gui.setInputFiles(inputFiles);
+      }
+   }
+
+   /**
+    * Return the input jar files.
+    *
+    * @return the input files
+    */
+   public File[] getInputFiles() {
+      return inputFiles;
    }
 
    /**
@@ -135,6 +167,18 @@ public class JarRepackager {
     */
    public void setOutputFile(File outputFile) {
       this.outputFile = outputFile;
+      if (gui != null) {
+         gui.setOutputFile(outputFile);
+      }
+   }
+
+   /**
+    * Return the output jar file.
+    *
+    * @return the output file
+    */
+   public File getOutputFile() {
+      return outputFile;
    }
 
    /**
@@ -176,7 +220,7 @@ public class JarRepackager {
          PropertiesParser propertiesParser = new PropertiesParser(this);
          manifestModel = propertiesParser.parse(propertiesFile);
       }
-      if (inputFiles != null && inputFiles.length != 0 && outputFile != null) {
+      if (inputFiles != null && inputFiles.length != 0 && outputFile != null && packagerErrors.isEmpty()) {
          JarPackagerReader reader = new JarPackagerReader(inputFiles);
          reader.setManifestModel(manifestModel);
          JarCollectionModel jarModel = reader.analyze();
@@ -187,6 +231,7 @@ public class JarRepackager {
          return true;
       } else {
          System.out.println("Repackaging Failed");
+         packagerErrors.add(new PackagerError("Repackaging Failed"));
          return false;
       }
    }

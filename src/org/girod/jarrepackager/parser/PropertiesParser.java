@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,14 +73,40 @@ public class PropertiesParser extends ResolverSAXHandler {
       this.debug = repackager.isDebugging();
    }
 
+   /**
+    * Parse the properties file and return the model of the manifest.
+    *
+    * @param propertiesFile the properties file
+    * @return the manifest model
+    */
    public ManifestModel parse(File propertiesFile) {
       this.dir = propertiesFile.getParentFile();
+      return parse(dir, propertiesFile);
+   }
+
+   /**
+    * Parse the properties file and return the model of the manifest.
+    *
+    * @param dir the parent directory
+    * @param propertiesFile the properties file
+    * @return the manifest model
+    */
+   public ManifestModel parse(File dir, File propertiesFile) {
+      this.dir = dir;
       URL schemaURL = PropertiesParser.class.getResource("properties.xsd");
       XMLSAXParser parser = new XMLSAXParser("Properties Parser");
       parser.setValidating(true);
+      parser.showExceptions(false);
+      parser.showWarnings(false);
       parser.setSchema(schemaURL);
       parser.setHandler(this);
       parser.parse(propertiesFile);
+      if (hasParserExceptions()) {
+         Iterator<ExceptionResult> it = getExceptionResults().iterator();
+         while (it.hasNext()) {
+            repackager.getErrors().add(new PackagerError(it.next()));
+         }
+      }
       return manifestModel;
    }
 

@@ -37,6 +37,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import org.girod.jarrepackager.JarRepackager;
+import org.girod.jarrepackager.parser.PackagerError;
 import org.mdiutil.swing.ExtensionFileFilter;
 import org.mdiutil.swing.JFileSelector;
 
@@ -226,6 +228,26 @@ public class JarRepackagerGUI extends JFrame {
       contentPanel.add((Box.createVerticalGlue()));
    }
 
+   /**
+    * Set the input jar files.
+    *
+    * @param inputFiles the input files
+    */
+   public void setInputFiles(File[] inputFiles) {
+      this.inputFiles = inputFiles;
+      inputSelector.setSelectedFiles(inputFiles);
+   }
+
+   /**
+    * Set the output jar file.
+    *
+    * @param outputFile the output file
+    */
+   public void setOutputFile(File outputFile) {
+      this.outputFile = outputFile;
+      outputSelector.setSelectedFile(outputFile);
+   }
+
    private void checkApplyState() {
       if (((inputFiles != null && inputFiles.length != 0) || propertiesFile != null) && outputFile != null) {
          applyAction.setEnabled(true);
@@ -252,6 +274,11 @@ public class JarRepackagerGUI extends JFrame {
                   setProgressFinishedText("Repackaging Finished");
                } else {
                   setProgressFinishedText("Repackaging Failed");
+                  List<PackagerError> packagerErrors = repackager.getErrors();
+                  if (!packagerErrors.isEmpty()) {
+                     ErrorLogger logger = new ErrorLogger();
+                     logger.showErrors(packagerErrors);
+                  }
                }
                return result;
             } catch (IOException ex) {
