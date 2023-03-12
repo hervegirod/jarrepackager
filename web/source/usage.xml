@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article desc="Usage">
+   <meta desc="This article presents the usage of the jarRepackager library" />
+   The interface lets you choose a list of jar files and specify the jar file which will repackage their content.
+   <img id="interface" />
+
+   <title title="interface content" />
+   The interface contains the following elements:
+   <ul>
+      <li>Input jar files: the selector allowing to specify the jar files you want to repackage</li>
+      <li>Output jar file: the selector allowing to specify the jar file which must be the result of the repackaging</li>
+      <li>Properties file: allows to specify an XML file which will specify how the jar files content will be added, including
+         the manifest properties</li>
+      <li>debug: a checkbox allowing to emit messages during the execution</li>
+   </ul>
+   The Apply action will be enabled when the input and output selectors have been set.
+
+   <title title="Algorithm" />
+   <moreInfo id="Algorithm" />
+
+   <see id="Algorithm" />
+   <cat id="general" />
+</article>

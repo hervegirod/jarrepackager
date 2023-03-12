@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article desc="Release history">
+   <altTitle desc="history" />
+   <meta desc="This article presents the history of the releases of the library" />
+
+   <title title="Version 0.1" />
+   Initial release of the library.
+
+   <cat id="general" />
+</article>

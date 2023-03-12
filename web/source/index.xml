@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<index>
+   This library allows to repackage multiple jar files of a library in one jar file.
+
+   <title title="usage"/>
+   <moreInfo id="usage" />
+   The interface lets you choose a list of jar files and specify the jar file which will repackage their content.
+   <img id="interface" />
+
+   <title title="distribution" />
+   <moreInfo id="distribution" />
+
+   <title title="License"/>
+   <moreInfo id="License" />
+
+   <title title="history"/>
+   <moreInfo id="Release history" />
+
+   <cat id="general" />
+</index>

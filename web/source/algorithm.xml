@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article desc="Algorithm">
+   <meta desc="This article presents the algorithm of the tool" />
+   The tool takes all the content of the input jar files (including the class files, but also the other files packages in the jar files),
+   and repackage them in the output jar file, repsecting the packages in which the files are present.
+
+   <title title="manifest properties" />
+   By default all the manifest properties of the input jar files will be added in the output jar file manifest. However the "Properties file"
+   selector allows to specify a jar file specifying which manifest properties will be added in the output.
+
+   <title level="2" title="properties grammar" />
+   The <resource href="properties.xsd" >properties Schema</resource> specifies the Schema of the Properties file.
+
+   <title level="2" title="properties grammar" />
+   The properties file has the following parent elements:
+   <ul>
+      <li>"Manifest": The Manifest content</li>
+      <li>"inputs": The list of input files</li>
+      <li>"output": The output file</li>
+      <li>"debug": The debug property</li>
+   </ul>
+
+   <cat id="general" />
+</article>
